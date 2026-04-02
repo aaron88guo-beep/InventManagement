@@ -1,0 +1,25 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-Inventory",
+      "appliesTo": "InventManagment/Inventory.cpp",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-InventManagment",
+      "appliesTo": "InventManagment/InventManagment.cpp",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-Item",
+      "appliesTo": "InventManagment/Item.cpp",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-Transaction",
+      "appliesTo": "InventManagment/Transaction.cpp",
+      "type": "launch"
+    }
+  ]
+}

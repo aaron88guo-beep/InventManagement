@@ -12,6 +12,13 @@ void Inventory::addItem(const std::shared_ptr<Item>& item)
         return;
     }
 
+    // Validation: reject items with negative price or quantity
+    if (item->getPrice() < 0.0 || item->getQuantity() < 0)
+    {
+        std::cout << "Error: Item has negative price or quantity. Rejecting add." << std::endl;
+        return;
+    }
+
     auto existingItem = findItemById(item->getItemId());
     if (existingItem)
     {
@@ -57,6 +64,18 @@ std::shared_ptr<Item> Inventory::findItemByName(const std::string& name)
 
 void Inventory::increaseStock(int itemId, int quantity)
 {
+    if (quantity < 0)
+    {
+        std::cout << "Error: Quantity to increase must be non-negative." << std::endl;
+        return;
+    }
+
+    if (quantity == 0)
+    {
+        std::cout << "No change: increase quantity is zero." << std::endl;
+        return;
+    }
+
     auto item = findItemById(itemId);
     if (item)
     {
@@ -71,6 +90,18 @@ void Inventory::increaseStock(int itemId, int quantity)
 
 void Inventory::decreaseStock(int itemId, int quantity)
 {
+    if (quantity < 0)
+    {
+        std::cout << "Error: Quantity to decrease must be non-negative." << std::endl;
+        return;
+    }
+
+    if (quantity == 0)
+    {
+        std::cout << "No change: decrease quantity is zero." << std::endl;
+        return;
+    }
+
     auto item = findItemById(itemId);
     if (item)
     {

@@ -1,0 +1,172 @@
+﻿#include "Inventory.h"
+#include <iostream>
+#include <algorithm>
+
+Inventory::Inventory() {}
+
+void Inventory::addItem(const std::shared_ptr<Item>& item)
+{
+    if (!item)
+    {
+        std::cout << "Error: Cannot add null item." << std::endl;
+        return;
+    }
+
+    // Validation: reject items with negative price or quantity
+    if (item->getPrice() < 0.0 || item->getQuantity() < 0)
+    {
+        std::cout << "Error: Item has negative price or quantity. Rejecting add." << std::endl;
+        return;
+    }
+
+    auto existingItem = findItemById(item->getItemId());
+    if (existingItem)
+    {
+        std::cout << "Item with ID " << item->getItemId() << " already exists." << std::endl;
+        return;
+    }
+
+    items.push_back(item);
+    std::cout << "Item '" << item->getItemName() << "' added successfully." << std::endl;
+}
+
+void Inventory::removeItem(int itemId)
+{
+    auto it = std::find_if(items.begin(), items.end(),
+        [itemId](const std::shared_ptr<Item>& item) { return item->getItemId() == itemId; });
+
+    if (it != items.end())
+    {
+        std::cout << "Item '" << (*it)->getItemName() << "' removed successfully." << std::endl;
+        items.erase(it);
+    }
+    else
+    {
+        std::cout << "Item with ID " << itemId << " not found." << std::endl;
+    }
+}
+
+std::shared_ptr<Item> Inventory::findItemById(int itemId)
+{
+    auto it = std::find_if(items.begin(), items.end(),
+        [itemId](const std::shared_ptr<Item>& item) { return item->getItemId() == itemId; });
+
+    return (it != items.end()) ? *it : nullptr;
+}
+
+std::shared_ptr<Item> Inventory::findItemByName(const std::string& name)
+{
+    auto it = std::find_if(items.begin(), items.end(),
+        [&name](const std::shared_ptr<Item>& item) { return item->getItemName() == name; });
+
+    return (it != items.end()) ? *it : nullptr;
+}
+
+void Inventory::increaseStock(int itemId, int quantity)
+{
+    if (quantity < 0)
+    {
+        std::cout << "Error: Quantity to increase must be non-negative." << std::endl;
+        return;
+    }
+
+    if (quantity == 0)
+    {
+        std::cout << "No change: increase quantity is zero." << std::endl;
+        return;
+    }
+
+    auto item = findItemById(itemId);
+    if (item)
+    {
+        item->setQuantity(item->getQuantity() + quantity);
+        std::cout << "Stock increased for item ID " << itemId << " by " << quantity << std::endl;
+    }
+    else
+    {
+        std::cout << "Item with ID " << itemId << " not found." << std::endl;
+    }
+}
+
+void Inventory::decreaseStock(int itemId, int quantity)
+{
+    if (quantity < 0)
+    {
+        std::cout << "Error: Quantity to decrease must be non-negative." << std::endl;
+        return;
+    }
+
+    if (quantity == 0)
+    {
+        std::cout << "No change: decrease quantity is zero." << std::endl;
+        return;
+    }
+
+    auto item = findItemById(itemId);
+    if (item)
+    {
+        if (item->getQuantity() >= quantity)
+        {
+            item->setQuantity(item->getQuantity() - quantity);
+            std::cout << "Stock decreased for item ID " << itemId << " by " << quantity << std::endl;
+        }
+        else
+        {
+            std::cout << "Insufficient stock for item ID " << itemId << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Item with ID " << itemId << " not found." << std::endl;
+    }
+}
+
+int Inventory::getTotalItems() const
+{
+    int total = 0;
+    for (const auto& item : items)
+    {
+        total += item->getQuantity();
+    }
+    return total;
+}
+
+double Inventory::getTotalValue() const
+{
+    double totalValue = 0.0;
+    for (const auto& item : items)
+    {
+        totalValue += item->getPrice() * item->getQuantity();
+    }
+    return totalValue;
+}
+
+void Inventory::displayInventory() const
+{
+    if (items.empty())
+    {
+        std::cout << "Inventory is empty." << std::endl;
+        return;
+    }
+
+    std::cout << "\n=== INVENTORY LISTING ===" << std::endl;
+    for (const auto& item : items)
+    {
+        item->displayItem();
+    }
+    std::cout << "Total Items: " << getTotalItems() << " | Total Value: $" << getTotalValue() << std::endl;
+}
+
+void Inventory::displayItemDetails(int itemId) const
+{
+    auto item = const_cast<Inventory*>(this)->findItemById(itemId);
+    if (item)
+    {
+        std::cout << "\n=== ITEM DETAILS ===" << std::endl;
+        item->displayItem();
+    }
+    else
+    {
+        std::cout << "Item with ID " << itemId << " not found." << std::endl;
+    }
+}
